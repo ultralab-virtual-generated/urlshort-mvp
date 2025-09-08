@@ -1,22 +1,49 @@
 name: Deploy to Fly.io
 
 on:
-  workflow_dispatch:
-    inputs:
-      app_name:
-        description: 'Fly app name'
-        required: true
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [ main ]
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: flyio-deploy-${{ github.ref }}
+      cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Build image
-        run: docker build -t urlshort-mvp:deploy .
-      - name: Deploy
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy to Fly.io
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          flyctl deploy --app ${{ github.event.inputs.app_name }} --remote-only --build-arg BUILDKIT_INLINE_CACHE=1
+          set -euo pipefail
+          mkdir -p logs
+          # Deploy and capture logs
+          flyctl deploy --remote-only --build-arg BUILDKIT_INLINE_CACHE=1 2>&1 | tee logs/deploy.log
+      - name: Upload deploy logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-logs
+          path: logs/deploy.log
+      - name: Post summary
+        if: always()
+        run: |
+          {
+            echo "## Fly.io Deployment";
+            echo "";
+            APP_NAME=$(grep -m1 -E '^app\s*=\s*' fly.toml | awk -F '"' '{print $2}' || true);
+            echo "- App: ${APP_NAME:-see fly.toml}";
+            echo "- Branch: $GITHUB_REF";
+            echo "- Commit: $GITHUB_SHA";
+            echo "";
+            echo "Last 20 lines of deploy log:";
+            echo '```';
+            tail -n 20 logs/deploy.log || true;
+            echo '```';
+          } >> "$GITHUB_STEP_SUMMARY"

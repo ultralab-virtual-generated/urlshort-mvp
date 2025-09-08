@@ -1,0 +1,81 @@
+# Build attempt 2 - success
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 704B done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1.7-labs
+#2 DONE 0.5s
+
+#3 docker-image://docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/python:3.11-slim
+#4 DONE 0.5s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/7] FROM docker.io/library/python:3.11-slim@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 256B done
+#7 DONE 0.0s
+
+#8 [2/7] WORKDIR /app
+#8 CACHED
+
+#9 [3/7] COPY requirements.txt ./
+#9 CACHED
+
+#10 [4/7] RUN pip install --no-deps -r requirements.txt
+#10 1.202 Collecting fastapi==0.111.0 (from -r requirements.txt (line 1))
+#10 1.426   Downloading fastapi-0.111.0-py3-none-any.whl.metadata (25 kB)
+#10 1.579 Collecting uvicorn==0.30.1 (from -r requirements.txt (line 2))
+#10 1.633   Downloading uvicorn-0.30.1-py3-none-any.whl.metadata (6.3 kB)
+#10 1.865 Collecting pydantic==2.7.4 (from -r requirements.txt (line 3))
+#10 1.916   Downloading pydantic-2.7.4-py3-none-any.whl.metadata (109 kB)
+#10 2.001      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 109.4/109.4 kB 1.4 MB/s eta 0:00:00
+#10 2.090 Collecting segno==1.6.1 (from -r requirements.txt (line 4))
+#10 2.143   Downloading segno-1.6.1-py3-none-any.whl.metadata (7.9 kB)
+#10 2.265 Collecting pytest==8.2.2 (from -r requirements.txt (line 5))
+#10 2.317   Downloading pytest-8.2.2-py3-none-any.whl.metadata (7.6 kB)
+#10 2.408 Collecting httpx==0.27.0 (from -r requirements.txt (line 6))
+#10 2.460   Downloading httpx-0.27.0-py3-none-any.whl.metadata (7.2 kB)
+#10 2.521 Downloading fastapi-0.111.0-py3-none-any.whl (91 kB)
+#10 2.544    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 92.0/92.0 kB 4.4 MB/s eta 0:00:00
+#10 2.603 Downloading uvicorn-0.30.1-py3-none-any.whl (62 kB)
+#10 2.612    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.4/62.4 kB 13.3 MB/s eta 0:00:00
+#10 2.670 Downloading pydantic-2.7.4-py3-none-any.whl (409 kB)
+#10 2.751    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 409.0/409.0 kB 5.2 MB/s eta 0:00:00
+#10 2.809 Downloading segno-1.6.1-py3-none-any.whl (73 kB)
+#10 2.815    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.9/73.9 kB 35.6 MB/s eta 0:00:00
+#10 2.875 Downloading pytest-8.2.2-py3-none-any.whl (339 kB)
+#10 2.894    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 339.9/339.9 kB 21.1 MB/s eta 0:00:00
+#10 2.953 Downloading httpx-0.27.0-py3-none-any.whl (75 kB)
+#10 2.957    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 75.6/75.6 kB 110.8 MB/s eta 0:00:00
+#10 2.970 Installing collected packages: uvicorn, segno, pytest, pydantic, httpx, fastapi
+#10 3.348 Successfully installed fastapi-0.111.0 httpx-0.27.0 pydantic-2.7.4 pytest-8.2.2 segno-1.6.1 uvicorn-0.30.1
+#10 3.348 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#10 3.600 
+#10 3.600 [notice] A new release of pip is available: 24.0 -> 25.2
+#10 3.600 [notice] To update, run: pip install --upgrade pip
+#10 DONE 3.7s
+
+#11 [5/7] COPY src ./src
+#11 DONE 0.0s
+
+#12 [6/7] COPY README.md ./
+#12 DONE 0.0s
+
+#13 [7/7] RUN useradd -m appuser && mkdir -p /app/logs /app/data && chown -R appuser:appuser /app
+#13 DONE 0.1s
+
+#14 exporting to image
+#14 exporting layers 0.1s done
+#14 writing image sha256:4b386006a6bbe660057863838b73e0eebdace2490e95bf7ce60a42bdf2512932 done
+#14 naming to docker.io/library/run-6-mvp:latest done
+#14 DONE 0.1s
