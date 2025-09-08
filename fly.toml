@@ -1,0 +1,32 @@
+app = "urlshort-mvp-yourname"
+primary_region = "iad"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+[build]
+
+[env]
+  PORT = "8080"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "2s"
+    method = "get"
+    path = "/healthz"
+    protocol = "http"
