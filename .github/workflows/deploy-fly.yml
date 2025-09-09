@@ -18,15 +18,25 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Deploy to Fly.io
+      - name: Ensure app exists and deploy to Fly.io
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p logs
+          APP_NAME=$(grep -m1 -E '^app\s*=\s*' fly.toml | awk -F '"' '{print $2}')
+          echo "App from fly.toml: $APP_NAME"
+          if ! flyctl status -a "$APP_NAME" >/dev/null 2>&1; then
+            echo "App '$APP_NAME' not found. Creating..."
+            flyctl apps create "$APP_NAME"
+            echo "App created."
+          else
+            echo "App '$APP_NAME' exists."
+          fi
           # Deploy and capture logs
           flyctl deploy --remote-only --build-arg BUILDKIT_INLINE_CACHE=1 2>&1 | tee logs/deploy.log
       - name: Upload deploy logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: deploy-logs
@@ -42,8 +52,8 @@ jobs:
             echo "- Branch: $GITHUB_REF";
             echo "- Commit: $GITHUB_SHA";
             echo "";
-            echo "Last 20 lines of deploy log:";
+            echo "Last 50 lines of deploy log:";
             echo '```';
-            tail -n 20 logs/deploy.log || true;
+            tail -n 50 logs/deploy.log || true;
             echo '```';
           } >> "$GITHUB_STEP_SUMMARY"
