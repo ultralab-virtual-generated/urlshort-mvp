@@ -33,7 +33,8 @@ Testing
 
 Deployment (Fly.io)
 - Configure app name in fly.toml
-- Set secrets (if any) and deploy via GitHub Actions workflow dispatch or flyctl
+- Ensure FLY_API_TOKEN in GitHub is a Fly.io org token for the target org (so the app is created under that org)
+- Push to main: CI runs then the Deploy workflow auto-runs and deploys to Fly.io
 
 Notes
 - City resolution is intentionally omitted (no external API). IP is recorded.
