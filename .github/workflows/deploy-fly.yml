@@ -21,23 +21,22 @@ jobs:
       - name: Ensure app exists and deploy to Fly.io
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          FLY_ORG: ultralab-virtual-generated
         run: |
           set -euo pipefail
           mkdir -p logs
           : > logs/deploy.log
           APP_NAME=$(grep -m1 -E '^app\s*=\s*' fly.toml | awk -F '"' '{print $2}')
           echo "App from fly.toml: $APP_NAME"
-          if ! flyctl status -a "$APP_NAME" --org "$FLY_ORG" >/dev/null 2>&1; then
-            echo "App '$APP_NAME' not found in org '$FLY_ORG'. Creating..."
-            flyctl apps create "$APP_NAME" --org "$FLY_ORG"
+          if ! flyctl status -a "$APP_NAME" >/dev/null 2>&1; then
+            echo "App '$APP_NAME' not found in default org of token. Creating..."
+            flyctl apps create "$APP_NAME"
             echo "App created."
           else
-            echo "App '$APP_NAME' exists in org '$FLY_ORG'."
+            echo "App '$APP_NAME' exists."
           fi
           # Deploy and capture logs (even on failure)
           set +e
-          flyctl deploy -a "$APP_NAME" --org "$FLY_ORG" --remote-only --build-arg BUILDKIT_INLINE_CACHE=1 2>&1 | tee logs/deploy.log
+          flyctl deploy -a "$APP_NAME" --remote-only --build-arg BUILDKIT_INLINE_CACHE=1 2>&1 | tee logs/deploy.log
           DEPLOY_EXIT=${PIPESTATUS[0]}
           set -e
           exit $DEPLOY_EXIT
@@ -49,15 +48,12 @@ jobs:
           path: logs/deploy.log
       - name: Post summary
         if: always()
-        env:
-          FLY_ORG: ultralab-virtual-generated
         run: |
           {
             echo "## Fly.io Deployment";
             echo "";
             APP_NAME=$(grep -m1 -E '^app\s*=\s*' fly.toml | awk -F '"' '{print $2}' || true);
             echo "- App: ${APP_NAME:-see fly.toml}";
-            echo "- Org: ${FLY_ORG}";
             echo "- Branch: $GITHUB_REF";
             echo "- Commit: $GITHUB_SHA";
             echo "";
